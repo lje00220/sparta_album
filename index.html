@@ -94,12 +94,12 @@
 
       $("#postingbtn").click(async function () {
         let image = $("#image").val();
-        let title = $("#emoji").val();
+        let emoji = $("#emoji").val();
         let content = $("#content").val();
         let date = $("#date").val();
         let doc = {
           image: image,
-          title: title,
+          emoji: emoji,
           content: content,
           date: date,
         };
@@ -117,9 +117,11 @@
         let row = doc.data();
 
         let image = row["image"];
-        let title = row["emoji"];
+        let emoji = row["emoji"];
         let content = row["content"];
         let date = row["date"];
+        console.log("emoji : ", emoji);
+        console.log("row = ", row);
 
         let temp_html = `
         <div class="col">
@@ -142,20 +144,40 @@
         $("#card").append(temp_html);
       });
 
+      let subwayUrl =
+        "http://swopenapi.seoul.go.kr/api/subway/7849484c716c6a6533396f7a635061/json/realtimeStationArrival/0/50/%EC%9D%98%EC%A0%95%EB%B6%80";
+      fetch(subwayUrl)
+        .then((res) => res.json())
+        .then((data) => {
+          let idx = data["realtimeArrivalList"].findIndex(
+            (elem) => elem["updnLine"] === "하행"
+          );
+          let subway = data["realtimeArrivalList"][idx]["arvlMsg3"];
+          let destination = data["realtimeArrivalList"][idx]["bstatnNm"];
+          let trainType = data["realtimeArrivalList"][idx]["btrainSttus"];
+
+          $("#subway").text(subway);
+          $("#destination").text(destination);
+          $("#type").text(trainType);
+        });
+
       let url = "http://spartacodingclub.shop/sparta_api/seoulair";
       fetch(url)
         .then((res) => res.json())
         .then((data) => {
           let mise = data["RealtimeCityAir"]["row"][0]["IDEX_NM"];
           $("#msg").text(mise);
-          // alert(`현재 서울의 미세먼지: ${mise}`);
+          alert(`현재 서울의 미세먼지: ${mise}`);
         });
     </script>
   </head>
   <body>
     <div class="mytitle">
       <h1>내일배움캠프를 시작하며</h1>
-      <p>현재 서울의 미세먼지 : <span id="msg">나쁨</span></p>
+      <p>
+        의정부역에서 가장 가까운 <span id="destination"></span>행
+        <span id="type"></span>열차는 <span id="subway"></span>역입니다.
+      </p>
       <button id="savebtn">추억 저장하기</button>
     </div>
     <div class="mypostingbox" id="postingbox">
@@ -175,10 +197,10 @@
           id="emoji"
         >
           <option selected>오늘의 기분</option>
-          <option value="1">😁</option>
-          <option value="2">😐</option>
-          <option value="3">☹️</option>
-          <option value="4">😷</option>
+          <option value="😁">😁</option>
+          <option value="😐">😐</option>
+          <option value="☹️">☹️</option>
+          <option value="😷">😷</option>
         </select>
       </div>
       <div class="form-floating mb-3">
